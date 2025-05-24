@@ -1,0 +1,29 @@
+package com.pluralsight;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class Order {
+    private List<OrderItem> items;
+
+    public Order() {
+        this.items = new ArrayList<>();
+    }
+
+    public void addItem(OrderItem item) {
+        items.add(item);
+    }
+
+    public double getTotalPrice() {
+        return items.stream().mapToDouble(OrderItem::getPrice).sum();
+    }
+
+    public String getDescription() {
+        StringBuilder desc = new StringBuilder("Order:\n");
+        for (OrderItem item : items) {
+            desc.append(item.getDescription()).append(String.format(" ($%.2f)\n", item.getPrice()));
+        }
+        desc.append(String.format("Total: $%.2f", getTotalPrice()));
+        return desc.toString();
+    }
+}
