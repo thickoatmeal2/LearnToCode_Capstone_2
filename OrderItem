@@ -2,28 +2,135 @@ package com.pluralsight;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
-public class Order {
-    private List<OrderItem> items;
+public interface OrderItem {
+    double getPrice();
+    String getDescription();
+}
 
-    public Order() {
-        this.items = new ArrayList<>();
+class Topping {
+    private String name;
+    private String category;
+    private double price;
+    private boolean isExtra;
+
+    public Topping(String name, String category, double price, boolean isExtra) {
+        this.name = name;
+        this.category = category;
+        this.price = price;
+        this.isExtra = isExtra;
     }
 
-    public void addItem(OrderItem item) {
-        items.add(item);
-    }
-
-    public double getTotalPrice() {
-        return items.stream().mapToDouble(OrderItem::getPrice).sum();
+    public double getPrice() {
+        return price;
     }
 
     public String getDescription() {
-        StringBuilder desc = new StringBuilder("Order:\n");
-        for (OrderItem item : items) {
-            desc.append(item.getDescription()).append(String.format(" ($%.2f)\n", item.getPrice()));
+        return (isExtra ? "Extra " : "") + name;
+    }
+
+    public String getName() {
+        return name;
+    }
+}
+
+class Sandwich implements OrderItem {
+    private String size;
+    private String bread;
+    private List<Topping> toppings;
+    private boolean isToasted;
+
+    public Sandwich(String size, String bread) {
+        this.size = size;
+        this.bread = bread;
+        this.toppings = new ArrayList<>();
+        this.isToasted = false;
+    }
+
+    public String getSize() {
+        return size;
+    }
+
+    public void addTopping(Topping topping) {
+        toppings.add(topping);
+    }
+
+    public List<Topping> getToppings() {
+        return new ArrayList<>(toppings);
+    }
+
+    public void setToasted(boolean isToasted) {
+        this.isToasted = isToasted;
+    }
+
+    @Override
+    public double getPrice() {
+        double basePrice;
+        switch (size) {
+            case "4\"": basePrice = 5.50; break;
+            case "8\"": basePrice = 7.00; break;
+            case "12\"": basePrice = 8.50; break;
+            default: basePrice = 0.0;
         }
-        desc.append(String.format("Total: $%.2f", getTotalPrice()));
+        double toppingPrice = toppings.stream().mapToDouble(Topping::getPrice).sum();
+        return basePrice + toppingPrice;
+    }
+
+    @Override
+    public String getDescription() {
+        StringBuilder desc = new StringBuilder();
+        desc.append(String.format("%s %s Sandwich", size, bread));
+        if (isToasted) desc.append(" (Toasted)");
+        if (!toppings.isEmpty()) {
+            desc.append("\n  Toppings:\n");
+            for (Topping topping : toppings) {
+                desc.append("    - ").append(topping.getDescription()).append(String.format(" ($%.2f)\n", topping.getPrice()));
+            }
+        }
         return desc.toString();
+    }
+}
+
+class Drink implements OrderItem {
+    private String size;
+    private String flavor;
+
+    public Drink(String size, String flavor) {
+        this.size = size;
+        this.flavor = flavor;
+    }
+
+    @Override
+    public double getPrice() {
+        switch (size) {
+            case "Small": return 2.00;
+            case "Medium": return 2.50;
+            case "Large": return 3.00;
+            default: return 0.0;
+        }
+    }
+
+    @Override
+    public String getDescription() {
+        return String.format("%s %s Drink", size, flavor);
+    }
+}
+
+class Chips implements OrderItem {
+    private String type;
+
+    public Chips(String type) {
+        this.type = type;
+    }
+
+    @Override
+    public double getPrice() {
+        return 1.50;
+    }
+
+    @Override
+    public String getDescription() {
+        return String.format("%s Chips", type);
     }
 }
