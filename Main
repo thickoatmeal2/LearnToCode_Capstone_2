@@ -1,6 +1,6 @@
 package com.pluralsight;
 
-public class Main {
+public class Driver {
     public static void main(String[] args) {
         PosApp app = new PosApp();
         app.run();
