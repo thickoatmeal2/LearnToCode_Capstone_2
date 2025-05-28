@@ -1,6 +1,7 @@
 package com.pluralsight;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
 
 public class PosApp {
@@ -32,11 +33,11 @@ public class PosApp {
     }
 
     private void displayAsciiArt() {
-        System.out.println(" ____  _____ _     ___      ");
-        System.out.println("|  _ \\| ____| |  |_ _ |  ");
-        System.out.println("| | | |  _| | |    | | ");
-        System.out.println("| |_| | |___| |___ | | ");
-        System.out.println("|____/|_____|_____|___|");
+        System.out.println(" ____  _____ _     ___ _         ");
+        System.out.println("|  _ \\| ____| |   |_ _| | ___  ___ ");
+        System.out.println("| | | |  _| | |    | || |/ __|/ _ \\");
+        System.out.println("| |_| | |___| |___ | || | (__| (_) |");
+        System.out.println("|____/|_____|_____|___|_| \\___|\\___/ !!");
         System.out.println();
     }
 
@@ -44,7 +45,9 @@ public class PosApp {
         while (true) {
             System.out.println("\nOrder Screen");
             System.out.println("1) Add Sandwich");
-            System.out.println("2) Checkout");
+            System.out.println("2) Add Drink");
+            System.out.println("3) Add Chips");
+            System.out.println("4) Checkout");
             System.out.println("0) Cancel Order");
             System.out.print("Choose an option: ");
             int choice = scanner.nextInt();
@@ -56,6 +59,10 @@ public class PosApp {
             } else if (choice == 1) {
                 addSandwich();
             } else if (choice == 2) {
+                addDrink();
+            } else if (choice == 3) {
+                addChips();
+            } else if (choice == 4) {
                 if (currentOrder.getTotalPrice() > 0) {
                     checkout();
                     break;
@@ -84,8 +91,105 @@ public class PosApp {
         }
 
         Sandwich sandwich = new Sandwich(size, bread);
+        addToppings(sandwich);
+
+        System.out.println("Would you like the sandwich toasted? (yes/no):");
+        String toastInput = scanner.nextLine().trim().toLowerCase();
+        sandwich.setToasted(toastInput.equals("yes"));
+
         currentOrder.addItem(sandwich);
         System.out.println("Sandwich added to order.");
+    }
+
+    private void addToppings(Sandwich sandwich) {
+        double meatPrice = sandwich.getSize().equals("4\"") ? 1.00 : sandwich.getSize().equals("8\"") ? 2.00 : 3.00;
+        double extraMeatPrice = sandwich.getSize().equals("4\"") ? 0.50 : sandwich.getSize().equals("8\"") ? 1.00 : 1.50;
+        double cheesePrice = sandwich.getSize().equals("4\"") ? 0.75 : sandwich.getSize().equals("8\"") ? 1.50 : 2.25;
+        double extraCheesePrice = sandwich.getSize().equals("4\"") ? 0.30 : sandwich.getSize().equals("8\"") ? 0.60 : 0.90;
+
+        List<String> meats = Arrays.asList("steak", "ham", "salami", "roast beef", "chicken", "bacon");
+        List<String> cheeses = Arrays.asList("american", "provolone", "cheddar", "swiss");
+        List<String> regulars = Arrays.asList("lettuce", "peppers", "onions", "tomatoes", "jalapeños", "cucumbers", "pickles", "guacamole", "mushrooms");
+        List<String> sauces = Arrays.asList("mayo", "mustard", "ketchup", "ranch", "thousand islands", "vinaigrette", "au jus", "sauce");
+
+        System.out.println("Add meats (enter names, separated by commas, or 'none'):");
+        String[] meatInputs = scanner.nextLine().toLowerCase().split(",");
+        for (String meat : meatInputs) {
+            meat = meat.trim();
+            if (meat.equals("none")) break;
+            if (meats.contains(meat)) {
+                sandwich.addTopping(new Topping(meat, "Meat", meatPrice, false));
+                System.out.println("Add extra " + meat + "? (yes/no):");
+                if (scanner.nextLine().trim().toLowerCase().equals("yes")) {
+                    sandwich.addTopping(new Topping(meat, "Meat", extraMeatPrice, true));
+                }
+            }
+        }
+
+        System.out.println("Add cheeses (enter names, separated by commas, or 'none'):");
+        String[] cheeseInputs = scanner.nextLine().toLowerCase().split(",");
+        for (String cheese : cheeseInputs) {
+            cheese = cheese.trim();
+            if (cheese.equals("none")) break;
+            if (cheeses.contains(cheese)) {
+                sandwich.addTopping(new Topping(cheese, "Cheese", cheesePrice, false));
+                System.out.println("Add extra " + cheese + "? (yes/no):");
+                if (scanner.nextLine().trim().toLowerCase().equals("yes")) {
+                    sandwich.addTopping(new Topping(cheese, "Cheese", extraCheesePrice, true));
+                }
+            }
+        }
+
+        System.out.println("Add regular toppings (enter names, separated by commas, or 'none'):");
+        String[] regularInputs = scanner.nextLine().toLowerCase().split(",");
+        for (String regular : regularInputs) {
+            regular = regular.trim();
+            if (regular.equals("none")) break;
+            if (regulars.contains(regular)) {
+                sandwich.addTopping(new Topping(regular, "Regular", 0.00, false));
+            }
+        }
+
+        System.out.println("Add sauces (enter names, separated by commas, or 'none'):");
+        String[] sauceInputs = scanner.nextLine().toLowerCase().split(",");
+        for (String sauce : sauceInputs) {
+            sauce = sauce.trim();
+            if (sauce.equals("none")) break;
+            if (sauces.contains(sauce)) {
+                sandwich.addTopping(new Topping(sauce, "Sauce", 0.00, false));
+            }
+        }
+    }
+
+    private void addDrink() {
+        System.out.println("\nSelect drink size (Small, Medium, Large):");
+        String size = scanner.nextLine().trim();
+        if (!Arrays.asList("Small", "Medium", "Large").contains(size)) {
+            System.out.println("Invalid size. Using Medium.");
+            size = "Medium";
+        }
+
+        System.out.println("Select flavor (e.g., Cola, Lemonade):");
+        String flavor = scanner.nextLine().trim();
+        if (flavor.isEmpty()) {
+            System.out.println("Invalid flavor. Using Cola.");
+            flavor = "Cola";
+        }
+
+        currentOrder.addItem(new Drink(size, flavor));
+        System.out.println("Drink added to order.");
+    }
+
+    private void addChips() {
+        System.out.println("\nSelect chip type (e.g., Plain, BBQ):");
+        String type = scanner.nextLine().trim();
+        if (type.isEmpty()) {
+            System.out.println("Invalid type. Using Plain.");
+            type = "Plain";
+        }
+
+        currentOrder.addItem(new Chips(type));
+        System.out.println("Chips added to order.");
     }
 
     private void checkout() {
@@ -98,7 +202,8 @@ public class PosApp {
         scanner.nextLine(); // Clear buffer
 
         if (choice == 1) {
-            System.out.println("Order confirmed. Thank you!");
+            currentOrder.saveToReceipt();
+            System.out.println("Order confirmed. Receipt saved. Thank you!");
             currentOrder = null;
         } else {
             System.out.println("Order cancelled.");
