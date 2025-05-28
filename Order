@@ -1,5 +1,11 @@
 package com.pluralsight;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,9 +27,30 @@ public class Order {
     public String getDescription() {
         StringBuilder desc = new StringBuilder("Order:\n");
         for (OrderItem item : items) {
-            desc.append(item.getDescription()).append(String.format(" ($%.2f)\n", item.getPrice()));
+            desc.append(item.getDescription()).append(String.format("\nSubtotal: $%.2f\n", item.getPrice()));
         }
         desc.append(String.format("Total: $%.2f", getTotalPrice()));
         return desc.toString();
+    }
+
+    public void saveToReceipt() {
+        try {
+            // Create receipts folder if it doesn't exist
+            Path receiptsDir = Paths.get("receipts");
+            if (!Files.exists(receiptsDir)) {
+                Files.createDirectory(receiptsDir);
+            }
+
+            // Generate filename with current date/time
+            LocalDateTime now = LocalDateTime.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss");
+            String filename = now.format(formatter) + ".txt";
+            Path receiptPath = receiptsDir.resolve(filename);
+
+            // Write order details to file
+            Files.writeString(receiptPath, getDescription());
+        } catch (IOException e) {
+            System.out.println("Error saving receipt: " + e.getMessage());
+        }
     }
 }
