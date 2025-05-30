@@ -34,10 +34,10 @@ public class PosApp {
 
     private void displayAsciiArt() {
         System.out.println(" ____  _____ _     ___ _         ");
-        System.out.println("|  _ \\| ____| |   |_ _| | ___  ___ ");
-        System.out.println("| | | |  _| | |    | || |/ __|/ _ \\");
-        System.out.println("| |_| | |___| |___ | || | (__| (_) |");
-        System.out.println("|____/|_____|_____|___|_| \\___|\\___/ !!");
+        System.out.println("|  _ \\| ____| |   |_ _| ");
+        System.out.println("| | | |  _| | |    | |");
+        System.out.println("| |_| | |___| |___ | |");
+        System.out.println("|____/|_____|_____|___|");
         System.out.println();
     }
 
