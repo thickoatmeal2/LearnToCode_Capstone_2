@@ -1,8 +1,13 @@
 package com.pluralsight;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 public class PosApp {
     private Order currentOrder;
@@ -11,20 +16,22 @@ public class PosApp {
     public void run() {
         scanner = new Scanner(System.in);
         displayAsciiArt();
-        System.out.println("Welcome to DELI-cious!");
+        System.out.println("Welcome to Jake's Sandwiches!");
         while (true) {
-            System.out.println("\nDELI-cious Home Screen");
+            System.out.println("\nJake's Sandwiches Home Screen");
             System.out.println("1) New Order");
+            System.out.println("2) View Previous Receipts");
             System.out.println("0) Exit");
             System.out.print("Choose an option: ");
             int choice = scanner.nextInt();
-            scanner.nextLine(); // Clear buffer
-
+            scanner.nextLine();
             if (choice == 0) {
                 break;
             } else if (choice == 1) {
                 currentOrder = new Order();
                 handleOrderScreen();
+            } else if (choice == 2) {
+                viewPreviousReceipts();
             } else {
                 System.out.println("Invalid option. Try again.");
             }
@@ -33,12 +40,24 @@ public class PosApp {
     }
 
     private void displayAsciiArt() {
-        System.out.println(" ____  _____ _     ___ _         ");
-        System.out.println("|  _ \\| ____| |   |_ _| ");
-        System.out.println("| | | |  _| | |    | |");
-        System.out.println("| |_| | |___| |___ | |");
-        System.out.println("|____/|_____|_____|___|");
-        System.out.println();
+        String asciiArt = generateASCIIArt("Jake's Sandwhiches");
+        System.out.println(asciiArt);
+    }
+
+    private String generateASCIIArt(String text) {
+        String[] lines = {
+            " ______________________ ",
+            "|                      |",
+            "| Jake's Sandwhiches   |",
+            "| ____________________ |",
+            "| |                  | |",
+            "| |                  | |",
+            "| |                  | |",
+            "| |                  | |",
+            "| |__________________| |",
+            "|______________________|"
+        };
+        return String.join("\n", lines);
     }
 
     private void handleOrderScreen() {
@@ -51,8 +70,7 @@ public class PosApp {
             System.out.println("0) Cancel Order");
             System.out.print("Choose an option: ");
             int choice = scanner.nextInt();
-            scanner.nextLine(); // Clear buffer
-
+            scanner.nextLine();
             if (choice == 0) {
                 currentOrder = null;
                 break;
@@ -82,21 +100,17 @@ public class PosApp {
             System.out.println("Invalid size. Using 8\".");
             size = "8\"";
         }
-
         System.out.println("Select bread (white, wheat, rye, wrap):");
         String bread = scanner.nextLine().trim().toLowerCase();
         if (!Arrays.asList("white", "wheat", "rye", "wrap").contains(bread)) {
             System.out.println("Invalid bread. Using white.");
             bread = "white";
         }
-
         Sandwich sandwich = new Sandwich(size, bread);
         addToppings(sandwich);
-
         System.out.println("Would you like the sandwich toasted? (yes/no):");
         String toastInput = scanner.nextLine().trim().toLowerCase();
         sandwich.setToasted(toastInput.equals("yes"));
-
         currentOrder.addItem(sandwich);
         System.out.println("Sandwich added to order.");
     }
@@ -106,12 +120,10 @@ public class PosApp {
         double extraMeatPrice = sandwich.getSize().equals("4\"") ? 0.50 : sandwich.getSize().equals("8\"") ? 1.00 : 1.50;
         double cheesePrice = sandwich.getSize().equals("4\"") ? 0.75 : sandwich.getSize().equals("8\"") ? 1.50 : 2.25;
         double extraCheesePrice = sandwich.getSize().equals("4\"") ? 0.30 : sandwich.getSize().equals("8\"") ? 0.60 : 0.90;
-
         List<String> meats = Arrays.asList("steak", "ham", "salami", "roast beef", "chicken", "bacon");
         List<String> cheeses = Arrays.asList("american", "provolone", "cheddar", "swiss");
         List<String> regulars = Arrays.asList("lettuce", "peppers", "onions", "tomatoes", "jalapeños", "cucumbers", "pickles", "guacamole", "mushrooms");
         List<String> sauces = Arrays.asList("mayo", "mustard", "ketchup", "ranch", "thousand islands", "vinaigrette", "au jus", "sauce");
-
         System.out.println("Add meats (enter names, separated by commas, or 'none'):");
         String[] meatInputs = scanner.nextLine().toLowerCase().split(",");
         for (String meat : meatInputs) {
@@ -125,7 +137,6 @@ public class PosApp {
                 }
             }
         }
-
         System.out.println("Add cheeses (enter names, separated by commas, or 'none'):");
         String[] cheeseInputs = scanner.nextLine().toLowerCase().split(",");
         for (String cheese : cheeseInputs) {
@@ -139,7 +150,6 @@ public class PosApp {
                 }
             }
         }
-
         System.out.println("Add regular toppings (enter names, separated by commas, or 'none'):");
         String[] regularInputs = scanner.nextLine().toLowerCase().split(",");
         for (String regular : regularInputs) {
@@ -149,7 +159,6 @@ public class PosApp {
                 sandwich.addTopping(new Topping(regular, "Regular", 0.00, false));
             }
         }
-
         System.out.println("Add sauces (enter names, separated by commas, or 'none'):");
         String[] sauceInputs = scanner.nextLine().toLowerCase().split(",");
         for (String sauce : sauceInputs) {
@@ -168,14 +177,12 @@ public class PosApp {
             System.out.println("Invalid size. Using Medium.");
             size = "Medium";
         }
-
         System.out.println("Select flavor (e.g., Cola, Lemonade):");
         String flavor = scanner.nextLine().trim();
         if (flavor.isEmpty()) {
             System.out.println("Invalid flavor. Using Cola.");
             flavor = "Cola";
         }
-
         currentOrder.addItem(new Drink(size, flavor));
         System.out.println("Drink added to order.");
     }
@@ -187,7 +194,6 @@ public class PosApp {
             System.out.println("Invalid type. Using Plain.");
             type = "Plain";
         }
-
         currentOrder.addItem(new Chips(type));
         System.out.println("Chips added to order.");
     }
@@ -199,8 +205,7 @@ public class PosApp {
         System.out.println("0) Cancel");
         System.out.print("Choose an option: ");
         int choice = scanner.nextInt();
-        scanner.nextLine(); // Clear buffer
-
+        scanner.nextLine();
         if (choice == 1) {
             currentOrder.saveToReceipt();
             System.out.println("Order confirmed. Receipt saved. Thank you!");
@@ -208,6 +213,47 @@ public class PosApp {
         } else {
             System.out.println("Order cancelled.");
             currentOrder = null;
+        }
+    }
+
+    private void viewPreviousReceipts() {
+        try {
+            Path receiptsDir = Paths.get("receipts");
+            if (!Files.exists(receiptsDir)) {
+                System.out.println("No receipts found. The receipts folder does not exist.");
+                return;
+            }
+            List<Path> receiptFiles = Files.list(receiptsDir)
+                .filter(path -> path.toString().endsWith(".csv"))
+                .sorted()
+                .collect(Collectors.toList());
+            if (receiptFiles.isEmpty()) {
+                System.out.println("No receipts found in the receipts folder.");
+                return;
+            }
+            System.out.println("\nAvailable Receipts:");
+            for (int i = 0; i < receiptFiles.size(); i++) {
+                System.out.println((i + 1) + ") " + receiptFiles.get(i).getFileName());
+            }
+            System.out.print("Select a receipt number (0 to cancel): ");
+            int choice = scanner.nextInt();
+            scanner.nextLine();
+            if (choice == 0) {
+                return;
+            }
+            if (choice < 1 || choice > receiptFiles.size()) {
+                System.out.println("Invalid selection. Returning to home screen.");
+                return;
+            }
+            Path selectedReceipt = receiptFiles.get(choice - 1);
+            System.out.println("\nReceipt: " + selectedReceipt.getFileName());
+            System.out.println("Contents:");
+            List<String> lines = Files.readAllLines(selectedReceipt);
+            for (String line : lines) {
+                System.out.println(line);
+            }
+        } catch (IOException e) {
+            System.out.println("Error reading receipts: " + e.getMessage());
         }
     }
 }
