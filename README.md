@@ -87,5 +87,11 @@ From the order sandwhich screen, the user is able to order a 4", 8", or 12" sand
 
 Interesting piece of code: The POSapp automatically gives the customer an 8" sandwhich if they input an invalid input. Similarly if a user inputs an invalid type of bread, the recieve white bread as a default. This is useful because it accounts for human error, and it is an example of how the code mimicks real world behavior. 
 
+Before
 
 ![Screenshot 2025-05-30 084716](https://github.com/user-attachments/assets/edb4d551-8a68-480e-b128-feb59bbb4e5d)
+
+After
+
+![Screenshot 2025-05-30 084716](https://github.com/user-attachments/assets/39f27ecc-c2bc-4561-b8be-1d97e1f2cde4)
+
